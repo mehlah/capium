@@ -1,5 +1,5 @@
 Capistrano::Configuration.instance(:must_exist).load do
-	require 'benchmark'
+  require 'benchmark'
   require 'capistrano/recipes/deploy/scm'
   require 'capistrano/recipes/deploy/strategy'
 
@@ -52,15 +52,15 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:current_path)      { File.join(deploy_to, current_dir) }
   _cset(:release_path)      { File.join(releases_path, release_name) }
 
-	_cset(:releases)          { capture("ls -x #{releases_path}", :except => { :no_release => true }).split.sort }
-	_cset(:current_release)   { releases.length > 0 ? File.join(releases_path, releases.last) : nil }
-	_cset(:previous_release)  { releases.length > 1 ? File.join(releases_path, releases[-2]) : nil }
+  _cset(:releases)          { capture("ls -x #{releases_path}", :except => { :no_release => true }).split.sort }
+  _cset(:current_release)   { releases.length > 0 ? File.join(releases_path, releases.last) : nil }
+  _cset(:previous_release)  { releases.length > 1 ? File.join(releases_path, releases[-2]) : nil }
 
-	_cset(:current_revision)  { capture("cat #{current_path}/REVISION",     :except => { :no_release => true }).chomp }
-	_cset(:latest_revision)   { capture("cat #{current_release}/REVISION",  :except => { :no_release => true }).chomp }
-	_cset(:previous_revision) { capture("cat #{previous_release}/REVISION", :except => { :no_release => true }).chomp if previous_release }
+  _cset(:current_revision)  { capture("cat #{current_path}/REVISION",     :except => { :no_release => true }).chomp }
+  _cset(:latest_revision)   { capture("cat #{current_release}/REVISION",  :except => { :no_release => true }).chomp }
+  _cset(:previous_revision) { capture("cat #{previous_release}/REVISION", :except => { :no_release => true }).chomp if previous_release }
 
-	_cset(:run_method)        { fetch(:use_sudo, true) ? :sudo : :run }
+  _cset(:run_method)        { fetch(:use_sudo, true) ? :sudo : :run }
 
   # some tasks, like symlink, need to always point at the latest release, but
   # they can also (occassionally) be called standalone. In the standalone case,
@@ -94,18 +94,18 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   # logs the command then executes it locally.
   # returns the command output as a string
-	def run_locally(cmd)
-		logger.trace "executing locally: #{cmd.inspect}" if logger
-		output_on_stdout = nil
-		elapsed = Benchmark.realtime do
-			output_on_stdout = `#{cmd}`
-		end
-		if $?.to_i > 0 # $? is command exit code (posix style)
-			raise Capistrano::LocalArgumentError, "Command #{cmd} returned status code #{$?}"
-		end
-		logger.trace "command finished in #{(elapsed * 1000).round}ms" if logger
-		output_on_stdout
-	end
+  def run_locally(cmd)
+    logger.trace "executing locally: #{cmd.inspect}" if logger
+    output_on_stdout = nil
+    elapsed = Benchmark.realtime do
+      output_on_stdout = `#{cmd}`
+    end
+    if $?.to_i > 0 # $? is command exit code (posix style)
+      raise Capistrano::LocalArgumentError, "Command #{cmd} returned status code #{$?}"
+    end
+    logger.trace "command finished in #{(elapsed * 1000).round}ms" if logger
+    output_on_stdout
+  end
 
   # If a command is given, this will try to execute the given command, as
   # described below. Otherwise, it will return a string for use in embedding in
@@ -147,7 +147,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
 
 
-	def capium()
+  def capium()
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
 
     after("deploy:symlink", "lithium:configure_library_path", "lithium:clear_cache")
@@ -423,36 +423,36 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   end
 
-	after "deploy:finalize_update" do
-		lithium.configure_library_path
-		lithium.clear_cache
-	end
+  after "deploy:finalize_update" do
+    lithium.configure_library_path
+    lithium.clear_cache
+  end
 
-	namespace :lithium do
+  namespace :lithium do
 
-		desc <<-DESC
-			Sets the path to the class libraries used by your Lithium application. \
-			This directory contain a copy of the Lithium core.
-		DESC
-		task :configure_library_path do
-			run "sed -i \"s/^define('LITHIUM_LIBRARY_PATH.*$/define('LITHIUM_LIBRARY_PATH', dirname(dirname(LITHIUM_APP_PATH)) . '\\/shared\\/libraries');/\" #{release_path}/config/bootstrap/libraries.php"
-		end
+    desc <<-DESC
+      Sets the path to the class libraries used by your Lithium application. \
+      This directory contain a copy of the Lithium core.
+    DESC
+    task :configure_library_path do
+      run "sed -i \"s/^define('LITHIUM_LIBRARY_PATH.*$/define('LITHIUM_LIBRARY_PATH', dirname(dirname(LITHIUM_APP_PATH)) . '\\/shared\\/libraries');/\" #{release_path}/config/bootstrap/libraries.php"
+    end
 
-		desc <<-DESC
-			Blow up all the cache files Lithium uses, ensuring a clean restart.
-		DESC
-		task :clear_cache do
-			run "rm -rf #{release_path}/resources/tmp/*"
+    desc <<-DESC
+      Blow up all the cache files Lithium uses, ensuring a clean restart.
+    DESC
+    task :clear_cache do
+      run "rm -rf #{release_path}/resources/tmp/*"
 
-			run [
-				"mkdir -p #{release_path}/resources/tmp/cache/templates",
-				"mkdir -p #{release_path}/resources/tmp/logs",
-				"mkdir -p #{release_path}/resources/tmp/tests",
+      run [
+        "mkdir -p #{release_path}/resources/tmp/cache/templates",
+        "mkdir -p #{release_path}/resources/tmp/logs",
+        "mkdir -p #{release_path}/resources/tmp/tests",
 
-				"chmod -R 777 #{release_path}/resources",
-			].join(' && ')
-		end
+        "chmod -R 777 #{release_path}/resources",
+      ].join(' && ')
+    end
 
-	end
+  end
 
 end # Capistrano::Configuration.instance(:must_exist).load do
