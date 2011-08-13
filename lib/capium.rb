@@ -27,6 +27,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   _cset(:deploy_to) { "/u/apps/#{application}" }
   _cset(:revision)  { source.head }
+  _cset(:lithium_repo) { "git://github.com/UnionOfRAD/lithium.git"}
+  _cset(:lithium_branch) { "master" }
 
   # =========================================================================
   # These variables should NOT be changed unless you are very confident in
@@ -149,7 +151,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   def capium()
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
-
+		after("deploy:setup", "lithium:setup")
     after("deploy:symlink", "lithium:configure_library_path", "lithium:clear_cache")
   end
   # =========================================================================
@@ -423,12 +425,40 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   end
 
-  after "deploy:finalize_update" do
-    lithium.configure_library_path
-    lithium.clear_cache
-  end
-
   namespace :lithium do
+
+    desc <<-DESC
+      Prepares server for deployment of a Lithium application. \
+
+      By default, it will create a shallow clone of the Lithium repository \
+      inside {shared_path}/libraries/lithium and run deploy:lithium:update.
+
+      For more info about shallow clones: \
+      http://www.kernel.org/pub/software/scm/git/docs/git-clone.html \
+
+      Further customization will require that you write your own task.
+    DESC
+    task :setup do
+      run "cd #{shared_path}/libraries && #{try_sudo} git clone --depth 1 #{lithium_repo} lithium"
+      set :git_flag_quiet, "-q "
+      update
+    end
+    desc <<-DESC
+      Force Lithium installation to checkout a new branch/tag. \
+
+      By default, it will checkout the :lithium_branch you set in \
+      deploy.rb, but you can change that on runtime by specifying \
+      the BRANCH environment variable:
+
+        $ cap deploy:lithium:update \\
+              BRANCH="lithium-0.10"
+
+      Further customization will require that you write your own task.
+    DESC
+    task :update do
+      set :lithium_branch, ENV['BRANCH'] if ENV.has_key?('BRANCH')
+      stream "cd #{shared_path}/libraries/lithium && #{try_sudo} git checkout #{git_flag_quiet}#{lithium_branch}"
+    end
 
     desc <<-DESC
       Sets the path to the class libraries used by your Lithium application. \
