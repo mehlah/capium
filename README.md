@@ -4,6 +4,10 @@ If you want to get the most out of Capistrano and you do not want to have to dea
 
 ## Assumptions
 
++ A Lithium app
++ Must have SSH access to the server you are deploying to.
++ You either have the same password to all target machines, or you have public keys in place to allow passwordless access to them.
+
 ## Installation
 
 ### Through RubyGems.org ###
@@ -16,10 +20,6 @@ If you want to get the most out of Capistrano and you do not want to have to dea
     cd capium
     gem build capium.gemspec
     sudo gem install capium-{version}.gem
-
-## Bundler Usage
-
-As of bundler 0.9 you should use `:require => nil` when listing this gem in your Gemfile.
 
 ## Usage
 
