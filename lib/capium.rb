@@ -27,6 +27,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   _cset(:deploy_to) { "/u/apps/#{application}" }
   _cset(:revision)  { source.head }
+
+  # Lithium variables
   _cset(:lithium_repo) { "git://github.com/UnionOfRAD/lithium.git"}
   _cset(:lithium_branch) { "master" }
 
@@ -154,6 +156,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 		after("deploy:setup", "lithium:setup")
     after("deploy:symlink", "lithium:configure_library_path", "lithium:clear_cache")
   end
+
   # =========================================================================
   # These are the tasks that are available to help with deploying web apps,
   # and specifically, Rails applications. You can have cap give you a summary
@@ -465,7 +468,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       This directory contain a copy of the Lithium core.
     DESC
     task :configure_library_path do
-      run "sed -i \"s/^define('LITHIUM_LIBRARY_PATH.*$/define('LITHIUM_LIBRARY_PATH', dirname(dirname(LITHIUM_APP_PATH)) . '\\/shared\\/libraries');/\" #{release_path}/config/bootstrap/libraries.php"
+      run "sed -i \"s=^define('LITHIUM_LIBRARY_PATH.*$=define('LITHIUM_LIBRARY_PATH', '#{shared_path}/libraries');=\" #{release_path}/config/bootstrap/libraries.php"
     end
 
     desc <<-DESC
