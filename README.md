@@ -62,6 +62,11 @@ If you want to try before you buy, here's the list of tasks included with this v
     cap invoke                           # Invoke a single command on the remote servers.
     cap shell                            # Begin an interactive Capistrano session.
 
+## Upcoming tasks
+
++ Running tests automatically after a successful deployment
++ Notifications (email)
++ Minimizing JS files and CSS
 
 ## Bugs & Feedback
 

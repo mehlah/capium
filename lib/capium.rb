@@ -31,6 +31,8 @@ Capistrano::Configuration.instance(:must_exist).load do
   # Lithium variables
   _cset(:lithium_repo) { "git://github.com/UnionOfRAD/lithium.git"}
   _cset(:lithium_branch) { "master" }
+  _cset :lithium_env, "production"
+  _cset(:run_lithium_tests) { false }
 
   # =========================================================================
   # These variables should NOT be changed unless you are very confident in
@@ -153,7 +155,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   def capium()
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
-		after("deploy:setup", "lithium:setup")
+    after("deploy:setup", "lithium:setup")
     after("deploy:symlink", "lithium:configure_library_path", "lithium:clear_cache")
   end
 
@@ -351,7 +353,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         directories = (releases - releases.last(count)).map { |release|
           File.join(releases_path, release) }.join(" ")
 
-        try_sudo "rm -rf #{directories}"
+          try_sudo "rm -rf #{directories}"
       end
     end
 
@@ -442,9 +444,12 @@ Capistrano::Configuration.instance(:must_exist).load do
       Further customization will require that you write your own task.
     DESC
     task :setup do
-      run "cd #{shared_path}/libraries && #{try_sudo} git clone --depth 1 #{lithium_repo} lithium"
+      run "cd #{shared_path}/libraries && git clone --depth 1 #{lithium_repo} lithium"
       set :git_flag_quiet, "-q "
       update
+      if run_lithium_tests
+        # test_core
+      end
     end
     desc <<-DESC
       Force Lithium installation to checkout a new branch/tag. \
@@ -460,7 +465,25 @@ Capistrano::Configuration.instance(:must_exist).load do
     DESC
     task :update do
       set :lithium_branch, ENV['BRANCH'] if ENV.has_key?('BRANCH')
-      stream "cd #{shared_path}/libraries/lithium && #{try_sudo} git checkout #{git_flag_quiet}#{lithium_branch}"
+      stream "cd #{shared_path}/libraries/lithium && git checkout #{git_flag_quiet}#{lithium_branch}"
+    end
+
+    desc <<-DESC
+      Run Lithium core tests
+    DESC
+    task :test_core do
+      set :li3_console, "#{shared_path}/libraries/lithium/console/li3"
+      set :li3_console_options, "--env=#{lithium_env}"
+      run "#{li3_console} test #{shared_path}/libraries/lithium/tests --env=#{lithium_env}"
+    end
+
+    desc <<-DESC
+      Run app tests
+    DESC
+    task :test_app do
+      set :li3_console, "#{shared_path}/libraries/lithium/console/li3"
+      set :li3_console_options, "--env=#{lithium_env}"
+      run "cd #{latest_release} && #{li3_console} test tests --env=#{lithium_env}"
     end
 
     desc <<-DESC
