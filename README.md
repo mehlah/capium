@@ -34,7 +34,7 @@ And make sure you start capium on the last line of that same file:
 
     capium
 
-You should then be able to proceed as you would usually, you may want to familiarise yourself with the truncated list of tasks, you can get a full list with:
+You should then be able to proceed as you would usually (`Capify .`), you may want to familiarise yourself with the truncated list of tasks, you can get a full list with:
 
     $ cap -T
 
@@ -56,6 +56,8 @@ If you want to try before you buy, here's the list of tasks included with this v
     cap deploy:update_code               # Copies your project to the remote servers.
     cap deploy:upload                    # Copy files to the currently deployed version.
     cap lithium:setup                    # Prepares server for deployment of a Lith...
+    cap lithium:test_core                # Run Lithium core tests
+    cap lithium:test_app                 # Run app tests
     cap lithium:update                   # Force Lithium installation to checkout a...
     cap lithium:clear_cache              # Blow up all the cache files Lithium uses...
     cap lithium:configure_library_path   # Sets the path to the class libraries use...

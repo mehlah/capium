@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = "capium"
-  s.version     = "0.0.2"
-  s.date        = "2011-08-14"
+  s.version     = "0.1.0"
+  s.date        = "2011-09-11"
   s.summary     = "Capistrano deploy recipes for Lithium"
   s.description = "Lithium app deployment using Capistrano made easy"
 
