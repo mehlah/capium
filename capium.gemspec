@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "capistrano", "~> 2.8.0"
 
-	s.author      = ["Mehdi Lahmam B."]
+  s.author      = ["Mehdi Lahmam B."]
   s.email       = "mehdi@lahmam.com"
   s.homepage    = "http://rubygems.org/gems/capium"
 end
