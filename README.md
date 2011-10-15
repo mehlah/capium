@@ -5,7 +5,7 @@ If you want to get the most out of Capistrano and you do not want to have to dea
 ## Assumptions
 
 + A Lithium app
-+ You don't have Lithium core library as a submodule in your application `libraries` folder, as you don't want to clone Lithium core each time you deploy your app (a couple time a day if you are as cool as Lithium!). Capium clones a fresh Lithium copy the first time you setup your deployment to a shared libraries path, then sets this path as `LITHIUM_LIBRARY_PATH` in your `/config/bootstrap/libraries.php` file.
++ You don't have Lithium core library as a submodule in your application `libraries` folder, as you don't want to clone Lithium core each time you deploy your app (a couple times a day if you are as cool as Lithium!). Capium clones a fresh Lithium copy the first time you setup your deployment to a shared libraries path, then sets this path as `LITHIUM_LIBRARY_PATH` in your `/config/bootstrap/libraries.php` file.
 + Must have SSH access to the server you are deploying to.
 + You either have the same password to all target machines, or you have public keys in place to allow passwordless access to them.
 
