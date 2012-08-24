@@ -68,10 +68,10 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   _cset(:run_method)        { fetch(:use_sudo, true) ? :sudo : :run }
 
-  # some tasks, like symlink, need to always point at the latest release, but
+  # some tasks, like create_symlink, need to always point at the latest release, but
   # they can also (occassionally) be called standalone. In the standalone case,
   # the timestamped release_path will be inaccurate, since the directory won't
-  # actually exist. This variable lets tasks like symlink work either in the
+  # actually exist. This variable lets tasks like create_symlink work either in the
   # standalone case, or during deployment.
   _cset(:latest_release) { exists?(:deploy_timestamped) ? release_path : current_release }
 
@@ -156,7 +156,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   def capium()
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
     after("deploy:setup", "lithium:setup")
-    after("deploy:symlink", "lithium:configure_library_path", "lithium:clear_cache")
+    after("deploy:create_symlink", "lithium:configure_library_path", "lithium:clear_cache")
   end
 
   # =========================================================================
@@ -196,7 +196,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc <<-DESC
       Copies your project and updates the symlink. It does this in a \
-      transaction, so that if either `update_code' or `symlink' fail, all \
+      transaction, so that if either `update_code' or `create_symlink' fail, all \
       changes made to the remote servers will be rolled back, leaving your \
       system in the same state it was in before `update' was invoked. Usually, \
       you will want to call `deploy' instead of `update', but `update' can be \
@@ -205,7 +205,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :update do
       transaction do
         update_code
-        symlink
+        create_symlink
       end
     end
 
@@ -255,7 +255,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       deploy, including `restart') or the 'update' task (which does everything \
       except `restart').
     DESC
-    task :symlink, :except => { :no_release => true } do
+    task :create_symlink, :except => { :no_release => true } do
       on_rollback do
         if previous_release
           run "rm -f #{current_path}; ln -s #{previous_release} #{current_path}; true"
